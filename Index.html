@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Para ti 💖</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* TARJETA */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    animation: aparecer 0.5s ease;
+}
+
+@keyframes aparecer {
+    from { opacity: 0; transform: scale(0.9);}
+    to { opacity: 1; transform: scale(1);}
+}
+
+.hidden { display: none; }
+
+h2 { margin-bottom: 10px; }
+p { color: #555; }
+
+/* INPUTS */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+/* BOTONES */
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+    margin: 5px;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: #ff3355;
+}
+
+/* corazones */
+.heart {
+    position: fixed;
+    animation: float 5s linear forwards;
+}
+
+@keyframes float {
+    from { transform: translateY(0); opacity:1;}
+    to { transform: translateY(-800px); opacity:0;}
+}
+
+/* gatito decorativo */
+.cat {
+    font-size: 40px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="card" id="login">
+    <div class="cat">🐱</div>
+    <h2>Acceso especial</h2>
+    <p>Solo para alguien importante 💖</p>
+
+    <input type="text" id="nombre" placeholder="Tu nombre">
+    <input type="password" id="pass" placeholder="Contraseña">
+
+    <button onclick="entrar()">Entrar</button>
+</div>
+
+<!-- CONTINUAR -->
+<div class="card hidden" id="continuar">
+    <div class="cat">🐾</div>
+    <h2>Hola <span id="user"></span></h2>
+    <p>Tengo algo bonito para ti…</p>
+
+    <button onclick="mostrarPregunta()">Continuar 💕</button>
+</div>
+
+<!-- PREGUNTA -->
+<div class="card hidden" id="pregunta">
+    <h2>💘 Alejandra</h2>
+    <p>¿Quieres ser mi novia?</p>
+
+    <button onclick="respuestaSi()">Sí 💖</button>
+    <button id="noBtn" onmouseover="mover()">No 😳</button>
+</div>
+
+<!-- RESPUESTA SI -->
+<div class="card hidden" id="si">
+    <h2>🥰 Te quiero muchísimo</h2>
+    <p>Sabía que dirías que sí 💖</p>
+
+    <button onclick="verResultado()">Continuar</button>
+</div>
+
+<!-- RESPUESTA NO -->
+<div class="card hidden" id="no">
+    <h2>😢 ¿Estás segura?</h2>
+
+    <button onclick="respuestaSi()">No 🤭</button>
+    <button onclick="alert('Sabía que dirías que sí 😏')">Claro que no</button>
+</div>
+
+<!-- RESULTADO OCULTO -->
+<div class="card hidden" id="resultado">
+    <h2>🔒 Área privada</h2>
+    <p>Solo para mí 😏</p>
+
+    <input type="password" id="clave" placeholder="Clave secreta">
+    <button onclick="mostrarResultado()">Ver resultado</button>
+
+    <p id="texto"></p>
+</div>
+
+<script>
+function entrar(){
+    let nombre = document.getElementById("nombre").value;
+    let pass = document.getElementById("pass").value;
+
+    if(pass === "contraseña"){
+        localStorage.setItem("nombre", nombre);
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("continuar").classList.remove("hidden");
+        document.getElementById("user").innerText = nombre;
+    } else {
+        alert("Contraseña incorrecta 😅");
+    }
+}
+
+function mostrarPregunta(){
+    document.getElementById("continuar").classList.add("hidden");
+    document.getElementById("pregunta").classList.remove("hidden");
+}
+
+function respuestaSi(){
+    localStorage.setItem("respuesta", "Sí 💖");
+
+    document.getElementById("pregunta").classList.add("hidden");
+    document.getElementById("no").classList.add("hidden");
+    document.getElementById("si").classList.remove("hidden");
+
+    corazones();
+}
+
+function mover(){
+    let b = document.getElementById("noBtn");
+    b.style.position="absolute";
+    b.style.top=Math.random()*80+"%";
+    b.style.left=Math.random()*80+"%";
+}
+
+function verResultado(){
+    document.getElementById("si").classList.add("hidden");
+    document.getElementById("resultado").classList.remove("hidden");
+}
+
+function mostrarResultado(){
+    let clave = document.getElementById("clave").value;
+
+    if(clave === "1234"){ // 👈 cambia esta clave si quieres
+        let nombre = localStorage.getItem("nombre");
+        let respuesta = localStorage.getItem("respuesta");
+
+        document.getElementById("texto").innerText =
+            nombre + " respondió: " + respuesta;
+    } else {
+        alert("Clave incorrecta 😅");
+    }
+}
+
+function corazones(){
+    for(let i=0;i<25;i++){
+        let h=document.createElement("div");
+        h.innerHTML="💖";
+        h.className="heart";
+        h.style.left=Math.random()*100+"vw";
+        h.style.fontSize=(Math.random()*20+20)+"px";
+        document.body.appendChild(h);
+
+        setTimeout(()=>h.remove(),5000);
+    }
+}
+</script>
+
+</body>
+</html>
