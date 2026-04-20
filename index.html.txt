@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Acceso especial 💖</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    overflow: hidden;
+}
+
+.container {
+    margin-top: 100px;
+}
+
+.hidden {
+    display: none;
+}
+
+input, button {
+    padding: 12px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+button {
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+
+.heart {
+    position: absolute;
+    animation: float 5s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0); opacity: 1;}
+    100% { transform: translateY(-800px); opacity: 0;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="login">
+    <h2>🔐 Acceso exclusivo</h2>
+    <input type="text" id="nombre" placeholder="Tu nombre"><br>
+    <input type="password" id="pass" placeholder="Contraseña"><br>
+    <button onclick="entrar()">Entrar 💖</button>
+</div>
+
+<!-- CONTINUAR -->
+<div class="container hidden" id="continuar">
+    <h2>Hola <span id="user"></span> 💕</h2>
+    <p>¿Deseas continuar?</p>
+    <button onclick="mostrarPregunta()">Sí 😍</button>
+    <button onclick="alert('No puedes escapar 😏')">No 😂</button>
+</div>
+
+<!-- PREGUNTA -->
+<div class="container hidden" id="pregunta">
+    <h2>💘 Alejandra Contreras</h2>
+    <h3>¿Quieres ser mi novia?</h3>
+    <button onclick="respuestaSi()">Sí 💖</button>
+    <button id="btnNo" onmouseover="moverBoton()" onclick="respuestaNo()">No 😳</button>
+</div>
+
+<!-- RESPUESTA SI -->
+<div class="container hidden" id="si">
+    <h2>🥰 TE QUIERO MUCHÍSIMO</h2>
+    <p>Sabía que dirías que sí 💖</p>
+    <button onclick="verResultado()">Ver resultado 😏</button>
+</div>
+
+<!-- RESPUESTA NO -->
+<div class="container hidden" id="no">
+    <h2>😢 ¿Estás segura?</h2>
+    <button onclick="respuestaSi()">No 🤭</button>
+    <button onclick="respuestaFinalNo()">Claro que no 😂</button>
+</div>
+
+<!-- RESULTADO -->
+<div class="container hidden" id="resultado">
+    <h2>📊 Resultado</h2>
+    <p id="textoResultado"></p>
+</div>
+
+<script>
+function entrar() {
+    let nombre = document.getElementById("nombre").value;
+    let pass = document.getElementById("pass").value;
+
+    if(pass === "contraseña") {
+        localStorage.setItem("nombre", nombre);
+
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("continuar").classList.remove("hidden");
+        document.getElementById("user").innerText = nombre;
+    } else {
+        alert("Contraseña incorrecta 😅");
+    }
+}
+
+function mostrarPregunta() {
+    document.getElementById("continuar").classList.add("hidden");
+    document.getElementById("pregunta").classList.remove("hidden");
+}
+
+function respuestaSi() {
+    let nombre = localStorage.getItem("nombre");
+
+    localStorage.setItem("respuesta", "Sí 💖");
+
+    document.getElementById("pregunta").classList.add("hidden");
+    document.getElementById("no").classList.add("hidden");
+    document.getElementById("si").classList.remove("hidden");
+
+    lanzarCorazones();
+}
+
+function respuestaNo() {
+    localStorage.setItem("respuesta", "Intentó decir que no 😳");
+
+    document.getElementById("pregunta").classList.add("hidden");
+    document.getElementById("no").classList.remove("hidden");
+}
+
+function respuestaFinalNo() {
+    localStorage.setItem("respuesta", "No ❌");
+
+    alert("😅 Bueno… al menos lo intenté");
+
+    verResultado();
+}
+
+function moverBoton() {
+    let btn = document.getElementById("btnNo");
+    btn.style.position = "absolute";
+    btn.style.top = Math.random() * window.innerHeight + "px";
+    btn.style.left = Math.random() * window.innerWidth + "px";
+}
+
+function lanzarCorazones() {
+    for(let i=0; i<30; i++){
+        let heart = document.createElement("div");
+        heart.innerHTML = "💖";
+        heart.className = "heart";
+        heart.style.left = Math.random()*100 + "vw";
+        heart.style.fontSize = (Math.random()*20 + 20) + "px";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 5000);
+    }
+}
+
+function verResultado() {
+    let nombre = localStorage.getItem("nombre");
+    let respuesta = localStorage.getItem("respuesta");
+
+    document.getElementById("si").classList.add("hidden");
+    document.getElementById("no").classList.add("hidden");
+    document.getElementById("resultado").classList.remove("hidden");
+
+    document.getElementById("textoResultado").innerText =
+        nombre + " respondió: " + respuesta;
+}
+</script>
+
+</body>
+</html>
