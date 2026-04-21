@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Para Alejandra 💖</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 10;
+    transition: all 0.5s ease;
+}
+
+.hidden { display: none !important; }
+
+h2 { margin-bottom: 10px; color: #333; font-size: 1.3em; }
+p { color: #555; font-size: 0.95em; line-height: 1.4; }
+
+input {
+    width: 100%; padding: 12px; margin: 10px 0;
+    border-radius: 12px; border: 1px solid #ddd;
+    outline: none; font-size: 16px;
+}
+
+button {
+    padding: 12px 15px; border: none; border-radius: 12px;
+    background: #ff4d6d; color: white; cursor: pointer;
+    margin: 8px 0; font-size: 16px; font-weight: bold; width: 100%;
+}
+
+.formula-box {
+    background: #fdf2f4; padding: 20px; border-radius: 15px;
+    margin: 15px 0; border: 1px dashed #ff4d6d;
+}
+
+.mensaje-container {
+    background: #e63946; border-radius: 15px; padding: 0;
+    height: 0; overflow: hidden; transition: all 0.6s ease; color: white;
+}
+.expandido .mensaje-container { height: auto; padding: 20px; margin-top: 15px; min-height: 320px; }
+
+#ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
+.star-label { position: absolute; color: rgba(230,230,230,0.9); font-style: italic; white-space: nowrap; font-family: serif; pointer-events: none; text-shadow: 0 0 8px rgba(255,255,255,0.4); }
+#galaxy-canvas { position: fixed; top: 0; left: 0; display: none; z-index: 5; }
+
+.heart { position: fixed; top: -50px; z-index: 1; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+
+<body>
+
+<div id="loading-screen" class="hidden" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100;">
+    <div style="border: 4px solid #333; border-left-color: #ff4d6d; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;"></div>
+    <div id="countdown-text" style="font-size: 2.5em; color:#ff4d6d; font-weight:bold;">3</div>
+</div>
+
+<div id="ui-layer"></div>
+<canvas id="galaxy-canvas"></canvas>
+
+<div class="card" id="login">
+    <div style="font-size: 40px;">🐱</div>
+    <h2>Acceso Especial</h2>
+    <input type="text" id="nombre" placeholder="Tu nombre">
+    <input type="password" id="pass" placeholder="Contraseña">
+    <button onclick="entrar()">Entrar</button>
+</div>
+
+<div class="card hidden" id="continuar">
+    <h2>Hola <span id="user"></span> 💕</h2>
+    <p>Supera el reto de ingeniería para continuar.</p>
+    <button onclick="mostrarExamen()">Aceptar Reto</button>
+</div>
+
+<div class="card hidden" id="examen">
+    <h2 id="lvlTitle">Reto #1</h2>
+    <div class="formula-box" id="formula-display"></div>
+    <div id="options-display"></div>
+    <p id="error-msg" style="color: #ff4d6d; font-weight: bold; display: none; margin-top: 10px;">¡Casi! Intenta esta otra 🧐</p>
+</div>
+
+<div class="card hidden" id="ventana-mensaje">
+    <div id="header-carta">
+        <div style="font-size: 45px;">📩</div>
+        <h2>Tienes un mensaje</h2>
+    </div>
+    <div class="mensaje-container" id="box-roja">
+        <div id="typewriter-text" style="text-align:left; margin-bottom:20px; line-height:1.4; font-size: 0.92em;"></div>
+        <div style="display:flex; justify-content: space-around;">
+            <svg width="35" height="35" viewBox="0 0 100 100"><path d="M20,80 Q20,40 50,40 Q80,40 80,80 Z" fill="black"/><path d="M30,45 L22,30 L40,42 Z" fill="black"/><path d="M70,45 L78,30 L60,42 Z" fill="black"/><circle cx="40" cy="58" r="4" fill="white"/><circle cx="60" cy="58" r="4" fill="white"/></svg>
+            <svg width="35" height="35" viewBox="0 0 100 100"><path d="M20,80 Q20,40 50,40 Q80,40 80,80 Z" fill="black"/><path d="M30,45 L22,30 L40,42 Z" fill="black"/><path d="M70,45 L78,30 L60,42 Z" fill="black"/><circle cx="40" cy="58" r="4" fill="white"/><circle cx="60" cy="58" r="4" fill="white"/></svg>
+        </div>
+    </div>
+    <button id="btn-abrir" onclick="iniciarEscritura()">Abrir Carta</button>
+    <button id="btn-final" class="hidden" onclick="irFinal()">Continuar ❤️</button>
+</div>
+
+<div class="card hidden" id="si">
+    <div style="font-size: 40px;">🥰</div>
+    <h2>Eres increíble</h2>
+    <p>Gracias por todo lo que eres.</p>
+    <button onclick="iniciarGalaxiaTotal()">Ver Galaxia ✨</button>
+</div>
+
+<script>
+let currentLvl = 0;
+const quest = [
+    { f: "d/dx [ x² sin(x) ]", ops: ["2x sin(x) + x² cos(x)", "2x cos(x)", "x² cos(x) - 2x"], c: 0 },
+    { f: "d/dx [ e²ˣ ]", ops: ["e²ˣ", "2e²ˣ", "2x e²ˣ"], c: 1 },
+    { f: "d/dx [ ln(x) ]", ops: ["1/x", "x", "eˣ"], c: 0 },
+    { f: "∫ 2x dx", ops: ["x² + C", "2 + C", "x + C"], c: 0 }
+];
+
+function entrar(){
+    if(document.getElementById("pass").value === "1"){
+        document.getElementById("user").innerText = document.getElementById("nombre").value;
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("continuar").classList.remove("hidden");
+    } else { alert("Pista: 1"); }
+}
+
+function mostrarExamen() {
+    document.getElementById("continuar").classList.add("hidden");
+    document.getElementById("examen").classList.remove("hidden");
+    renderDerivada();
+}
+
+function renderDerivada() {
+    const item = quest[currentLvl % quest.length];
+    document.getElementById("lvlTitle").innerText = "Reto #" + (currentLvl + 1);
+    document.getElementById("formula-display").innerHTML = `<div style="font-family:serif; font-style:italic; font-size:1.4em;">${item.f}</div>`;
+    const opts = document.getElementById("options-display");
+    opts.innerHTML = "";
+    item.ops.forEach((t, i) => {
+        const b = document.createElement("button");
+        b.innerText = t;
+        b.onclick = () => {
+            if(i === item.c) { document.getElementById("examen").classList.add("hidden"); iniciarCarga(); }
+            else { currentLvl++; document.getElementById("error-msg").style.display = "block"; setTimeout(() => { document.getElementById("error-msg").style.display = "none"; }, 2000); renderDerivada(); }
+        };
+        opts.appendChild(b);
+    });
+}
+
+function iniciarCarga() {
+    const screen = document.getElementById("loading-screen");
+    let t = 3; screen.classList.remove("hidden");
+    const timer = setInterval(() => {
+        t--; document.getElementById("countdown-text").innerText = t;
+        if(t <= 0) { clearInterval(timer); screen.classList.add("hidden"); document.getElementById("ventana-mensaje").classList.remove("hidden"); }
+    }, 1000);
+}
+
+function iniciarEscritura() {
+    document.getElementById("btn-abrir").classList.add("hidden");
+    document.getElementById("header-carta").classList.add("hidden");
+    document.getElementById("ventana-mensaje").classList.add("expandido");
+    const msg = "Para la niña más linda que he conocido, antes de todo se me da mal las cartas pero me anime hacerlo, por qué aveces palabras bonitas alegran a las personas y tú eres alguien quien se merece muchas palabras bonitas por la persona que eres, sin duda la mejor chica que he tenido el placer de conocer.\n\nMe gusta mucho cómo eres, tú determinación, las ganas de avanzar, el corazón tan bonito que tienes y lo sensible aún que no lo demuestres tanto.\n\nY lo hermosa que eres, me pregunto qué tan inspirado estaba Dios cuando creo tremenda obra de arte jejej\n\n“Eres toda hermosa, amada mía; no hay en ti defecto.”\n(Cantar de los Cantares 4:7)";
+    let i = 0;
+    const target = document.getElementById("typewriter-text");
+    function escribir() {
+        if (i < msg.length) { 
+            target.innerHTML += msg.charAt(i) === '\n' ? '<br>' : msg.charAt(i); 
+            i++; setTimeout(escribir, 35); 
+        }
+        else { document.getElementById("btn-final").classList.remove("hidden"); }
+    }
+    setTimeout(escribir, 500);
+}
+
+function irFinal() { document.getElementById("ventana-mensaje").classList.add("hidden"); document.getElementById("si").classList.remove("hidden"); }
+
+// --- GALAXIA CON MUCHAS PALABRAS ---
+function iniciarGalaxiaTotal() {
+    document.getElementById("si").classList.add("hidden");
+    const canvas = document.getElementById('galaxy-canvas');
+    canvas.style.display = "block";
+    const ctx = canvas.getContext('2d');
+    const uiLayer = document.getElementById('ui-layer');
+    let width, height, centerX, centerY;
+    const particles = [];
+    
+    // LISTA EXPANDIDA DE PALABRAS
+    const msjs = [
+        "Hermosa", "Preciosa", "Linda", "Pedazo de luna", "Princesa", "Reyna", 
+        "Especial", "Ojos hermosos", "Increíble", "La mejor", "Chiquita", 
+        "Cachetona", "Estrella", "Unica", "Maravillosa", "Dulzura", "Mi Paz",
+        "Magia", "Perfecta", "Brillante", "Encantadora", "Valiosa", "Única",
+        "Determinada", "Corazón de oro", "Arte puro", "Luz", "Cielo"
+    ];
+
+    function res() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; centerX = width / 2; centerY = height / 2; }
+    window.addEventListener('resize', res); res();
+
+    class P {
+        constructor(isL) { 
+            this.isL = isL; 
+            this.t = Math.random()*Math.PI*2; 
+            this.p = (Math.random()-0.5)*0.4; 
+            this.d = Math.random()*380+30; 
+            this.s = Math.random()*0.002+0.0005; 
+            this.z = isL ? 0 : Math.random()*1.5+0.5; 
+            if(isL){ 
+                this.el = document.createElement('div'); 
+                this.el.className='star-label'; 
+                this.el.innerText=msjs[Math.floor(Math.random()*msjs.length)]; 
+                this.el.style.fontSize = (Math.random() * 10 + 10) + "px";
+                uiLayer.appendChild(this.el); 
+            } 
+        }
+        up() { 
+            this.t += this.s; 
+            let x3 = this.d*Math.cos(this.t), y3 = this.d*Math.sin(this.p), z3 = this.d*Math.sin(this.t); 
+            let c=Math.cos(0.4), s=Math.sin(0.4); 
+            let y2 = y3*c - z3*s, z2 = z3*c + y3*s; 
+            let sc = 700/(700+z2); 
+            this.x = centerX+x3*sc; this.y = centerY+y2*sc; this.sc = sc; 
+        }
+        dr() { 
+            if(!this.isL){ ctx.beginPath(); ctx.arc(this.x, this.y, this.z*this.sc, 0, Math.PI*2); ctx.fillStyle="#fff"; ctx.fill(); } 
+            else { 
+                this.el.style.left=`${this.x}px`; this.el.style.top=`${this.y}px`; 
+                this.el.style.opacity = Math.max(0, (this.sc-0.4)*2.5); 
+                this.el.style.transform=`translate(-50%,-50%) scale(${this.sc})`; 
+            } 
+        }
+    }
+    
+    // Aumentamos la cantidad de etiquetas de texto a 30
+    for(let i=0; i<450; i++) particles.push(new P(false));
+    for(let i=0; i<30; i++) particles.push(new P(true));
+
+    function anim() { 
+        ctx.fillStyle='rgba(0,0,0,0.1)'; ctx.fillRect(0,0,width,height); 
+        const g = ctx.createRadialGradient(centerX,centerY,0,centerX,centerY,40); g.addColorStop(0,'#fff'); g.addColorStop(1,'#aaa');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(centerX,centerY,40,0,Math.PI*2); ctx.fill();
+        particles.forEach(p=>{p.up(); p.dr();}); requestAnimationFrame(anim);
+    }
+    anim();
+}
+
+setInterval(() => {
+    const h = document.createElement("div"); h.innerHTML = '❤'; h.className = 'heart';
+    h.style.left = Math.random()*100+"vw"; h.style.fontSize = (Math.random()*15+10)+"px";
+    h.style.animationDuration = (Math.random()*3+3)+"s";
+    document.body.appendChild(h); setTimeout(()=>h.remove(), 5000);
+}, 400);
+</script>
+</body>
+</html>
